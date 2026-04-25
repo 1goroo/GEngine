@@ -2,10 +2,13 @@
 using GEngine.Core;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
-using Utilities;
+using System;
 
 namespace GEngine.Graphics
 {
+    /// <summary>
+    /// Stores ASCII image for drawing
+    /// </summary>
     public struct ASCIIImage
     {
         public string[] text { get; private set; }
@@ -13,6 +16,7 @@ namespace GEngine.Graphics
         public Color color { get; private set; }
         public float height;
         public float width;
+        ASCIILine[] lines;
         public ASCIIImage(string[] _text, SpriteFontBase _spf, Color _color)
         {
             text = _text;
@@ -25,33 +29,85 @@ namespace GEngine.Graphics
                 float maxWidth = spf.MeasureString(text[i]).X;
                 if (width < maxWidth) width = maxWidth;
             }
+            lines = new ASCIILine[text.Length];
+            for (int i = 0; i < text.Length; i++) 
+                lines[i] = new ASCIILine(text[i], Array.Empty<Color>(), color);
         }
+        public ASCIIImage(string[] _text, SpriteFontBase _spf, Color baseColor, Color[][] currentColor)
+        {
+            text = _text;
+            spf = _spf;
+            color = baseColor;
+            height = text.Length * spf.LineHeight;
+            width = 0;
+            for (int i = 0; i < text.Length; i++)
+            {
+                float maxWidth = spf.MeasureString(text[i]).X;
+                if (width < maxWidth) width = maxWidth;
+            }
+            lines = new ASCIILine[text.Length];
+            for (int i = 0; i < text.Length; i++)
+            {
+                if (currentColor.Length - i > 0)
+                    lines[i] = new ASCIILine(text[i], currentColor[i], color);
+                else
+                {
+                    Color[] newColor = new Color[text[i].Length];
+                    Array.Fill<Color>(newColor, color);
+                    lines[i] = new ASCIILine(text[i], newColor, color);
+                }
+            }
+        }
+        /// <summary>
+        /// Drawing ASCIIImage in game position
+        /// </summary>
         public void Draw(SpriteBatch spriteBatch, Vector2 position)
         {
-            //Vector2 vector = Converter.Vector2Position(position, height, width);
             Vector2 vector = Transform.GameToScreenPosition(position, height, width);
             if (text == null) return;
             for (int i = 0; i < text.Length; i++)
-            {
-                spriteBatch.DrawString(spf, text[i], new Vector2(vector.X, vector.Y + spf.LineHeight * i), color);
-            }
+                spriteBatch.DrawString(spf, lines[i].text, new Vector2(vector.X, vector.Y + spf.LineHeight * i), lines[i].lineColor);
         }
+        /// <summary>
+        /// Drawing ASCIIImage in game position
+        /// </summary>
         public void Draw(SpriteBatch spriteBatch, Vector2 position, Vector2 scale)
         {
             Vector2 vector = Transform.GameToScreenPosition(position, width * scale.X, height * scale.Y);
             if (text == null) return;
             for (int i = 0; i < text.Length; i++)
-            {
-                spriteBatch.DrawString(spf, text[i], new Vector2(vector.X, vector.Y + spf.LineHeight * i * scale.Y), color, 0, default, scale);
-            }
+                spriteBatch.DrawString(spf, lines[i].text, new Vector2(vector.X, vector.Y + spf.LineHeight * i * scale.Y),
+                    lines[i].lineColor, 0, default, scale);
         }
+        /// <summary>
+        /// Drawing ASCIIImage in game position
+        /// </summary>
         public void Draw(SpriteBatch spriteBatch, Transform transform)
         {
             Vector2 vector = Transform.GameToScreenPosition(transform.position, width * transform.scale.X, height * transform.scale.Y);
             if (text == null) return;
-            for (int i = 0; i < text.Length; i++)
+            for (int i = 0; i < lines.Length; i++)
+                spriteBatch.DrawString(spf, lines[i].text, new Vector2(vector.X, vector.Y + spf.LineHeight * i * transform.scale.Y),
+                    lines[i].lineColor, 0, default, transform.scale);
+        }
+        /// <summary>
+        /// Stores line of ASCII image
+        /// </summary>
+        private struct ASCIILine
+        {
+            public string text;
+            public Color[] lineColor;
+            public ASCIILine(string text, Color[] color, Color baseColor)
             {
-                spriteBatch.DrawString(spf, text[i], new Vector2(vector.X , vector.Y  + spf.LineHeight * i * transform.scale.Y), color, 0, default, transform.scale);
+                this.text = text;
+                lineColor = new Color[text.Length];
+
+                for (int i = 0; i < lineColor.Length; i++)
+                    lineColor[i] = baseColor;
+
+                int colorsToCopy = Math.Min(text.Length, color.Length);
+                for (int i = 0; i < colorsToCopy; i++)
+                    lineColor[i] = color[i];
             }
         }
     }
