@@ -28,11 +28,12 @@ namespace GEngine.Graphics
         }
         public void Draw(SpriteBatch spriteBatch, Vector2 position)
         {
-            Vector2 vector = Converter.Vector2Position(position, height, width);
+            //Vector2 vector = Converter.Vector2Position(position, height, width);
+            Vector2 vector = Transform.GameToScreenPosition(position, height, width);
             if (text == null) return;
             for (int i = 0; i < text.Length; i++)
             {
-                spriteBatch.DrawString(spf, text[i], new Vector2(vector.X, vector.Y + spf.FontSize * i), color);
+                spriteBatch.DrawString(spf, text[i], new Vector2(vector.X, vector.Y + spf.LineHeight * i), color);
             }
         }
         public void Draw(SpriteBatch spriteBatch, Vector2 position, Vector2 scale)
@@ -41,7 +42,7 @@ namespace GEngine.Graphics
             if (text == null) return;
             for (int i = 0; i < text.Length; i++)
             {
-                spriteBatch.DrawString(spf, text[i], new Vector2(vector.X, vector.Y + spf.FontSize * i * scale.Y), color, 0, default, scale);
+                spriteBatch.DrawString(spf, text[i], new Vector2(vector.X, vector.Y + spf.LineHeight * i * scale.Y), color, 0, default, scale);
             }
         }
         public void Draw(SpriteBatch spriteBatch, Transform transform)
@@ -50,7 +51,7 @@ namespace GEngine.Graphics
             if (text == null) return;
             for (int i = 0; i < text.Length; i++)
             {
-                spriteBatch.DrawString(spf, text[i], new Vector2(vector.X, vector.Y + spf.FontSize * i * transform.scale.Y), color, 0, default, transform.scale);
+                spriteBatch.DrawString(spf, text[i], new Vector2(vector.X , vector.Y  + spf.LineHeight * i * transform.scale.Y), color, 0, default, transform.scale);
             }
         }
     }

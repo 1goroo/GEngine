@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -99,7 +100,7 @@ namespace GEngine.Core
         public void Destroy(BaseObject baseObject) => RemoveObject(baseObject);
         public void RemoveObject(BaseObject baseObject) => RemoveList.Add(baseObject);
 
-        public static BaseObject Find(string name, SearchScope searchScope = SearchScope.All) => Core.Find(name, searchScope);
+        public static T Find<T>(string name, SearchScope searchScope = SearchScope.All) where T : BaseObject => Core.Find<T>(name, searchScope);
 
         public void Update(GameTime gameTime)
         {
@@ -190,20 +191,20 @@ namespace GEngine.Core
             return baseObject;
         }
         public static void Destroy(BaseObject baseObject) => Instance.RemoveObject(baseObject); 
-        public static BaseObject Find(string name, SearchScope searchScope = SearchScope.All)
+        public static T Find<T>(string name, SearchScope searchScope = SearchScope.All) where T : BaseObject
         {
             if (searchScope == SearchScope.All || searchScope == SearchScope.Local)
             {
                 for (int i = 0; i < Instance.currentScene.AddList.Count; i++) 
                 {
-                    if (Instance.currentScene.AddList[i].ObjectName == name) return Instance.currentScene.AddList[i];
+                    if (Instance.currentScene.AddList[i].ObjectName == name) return (T)Instance.currentScene.AddList[i];
                 }
             }
             if (searchScope == SearchScope.All || searchScope == SearchScope.Global)
             {
                 for (int i = 0;i < Instance.ObjectsList.Count;i++) 
                 {
-                    if (Instance.ObjectsList[i].ObjectName == name) return Instance.ObjectsList[i];
+                    if (Instance.ObjectsList[i].ObjectName == name) return (T)Instance.ObjectsList[i];
                 }
             }
 
@@ -211,7 +212,7 @@ namespace GEngine.Core
             {
                 for (int i = 0; i < Instance.AddList.Count; i++) 
                 {
-                    if (Instance.AddList[i].ObjectName == name) return Instance.AddList[i];
+                    if (Instance.AddList[i].ObjectName == name) return (T)Instance.AddList[i];
                 }
             }
  
@@ -220,7 +221,7 @@ namespace GEngine.Core
             {
                 for (int i = 0; i < Instance.currentScene.ObjectsList.Count; i++)
                 {
-                    if (Instance.currentScene.ObjectsList[i].ObjectName == name) return Instance.currentScene.ObjectsList[i];
+                    if (Instance.currentScene.ObjectsList[i].ObjectName == name) return (T)Instance.currentScene.ObjectsList[i];
                 }
             }
 
@@ -483,6 +484,8 @@ namespace GEngine.Core
         {
             public static ImageWindow Instance { get; private set; }
             public ASCIIImage? currentImage { get; private set; }
+            private float ignoreScale = 1;
+            private Vector2 ignoreVector = Vector2.Zero;
             public ImageWindow(string name = null) : base(name)
             {
                 Instance = this;
@@ -493,15 +496,25 @@ namespace GEngine.Core
                 if (currentImage != null)
                 {
                     ASCIIImage image = (ASCIIImage)currentImage;
-                    Transform currTr = new Transform(new Vector2(520,220));
+                    Transform currTr = new Transform(new Vector2(520+ ignoreVector.X,220+ignoreVector.Y));
                     float limit = 280f;
                     float s = Math.Min(limit / image.width, limit / image.height);
-                    currTr.scale = new Vector2(s,s);
+                    currTr.scale = new Vector2(s,s) * ignoreScale;
                     
                     currentImage?.Draw(spriteBatch, currTr);
                 }
             }
-            public void SetImage(ASCIIImage newImage) => currentImage = newImage;
+            public void SetImage(ASCIIImage newImage) 
+            {
+                currentImage = newImage;
+                ignoreScale = 1;
+            }
+            public void SetImage(ASCIIImage newImage, float ignoreScale, Vector2 ignoreVector)
+            {
+                currentImage = newImage;
+                this.ignoreScale = ignoreScale;
+                this.ignoreVector = ignoreVector;
+            }
         }
         public class InformationConsole : BaseObject
         {
@@ -606,6 +619,7 @@ namespace Utilities
 {
     public static class Converter
     {
+        [Obsolete("Use Transform.GameToScreenPosition")]
         public static Vector2 Vector2Position(Vector2 vector, float height, float width) => new Vector2(vector.X - width * 0.5f, vector.Y - height * 0.5f);
     }
 }

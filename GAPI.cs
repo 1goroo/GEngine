@@ -37,6 +37,7 @@ namespace GAPI
         public static void WriteLineInformation(string text, Color color, SpriteFontBase spf) => Core.InformationConsole.Instance.WriteLine(spf, text, color);
 
         public static void SetImage(ASCIIImage image) => Core.ImageWindow.Instance.SetImage(image);
+        public static void SetImage(ASCIIImage image, float ignoreScale, Vector2 ignoreVector) => Core.ImageWindow.Instance.SetImage(image, ignoreScale, ignoreVector);
     }
     public static class Palettes
     {
