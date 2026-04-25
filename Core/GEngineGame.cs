@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using GEngine.Framework;
 namespace GEngine.Core
 {
     public class GEngineGame : Game
@@ -30,7 +31,7 @@ namespace GEngine.Core
         }
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.Clear(Color.Purple);
             generalCore.Draw(gameTime);
             base.Draw(gameTime);
         }

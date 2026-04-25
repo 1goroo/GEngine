@@ -2,6 +2,7 @@
 using GEngine.Core;
 using Microsoft.Xna.Framework;
 using GEngine.Graphics;
+using GEngine.Assets;
 
 namespace GAPI
 {
@@ -9,25 +10,25 @@ namespace GAPI
     {
         public static class Fonts
         {
-            public static FontSystem baseEngineFont = new FontSystem();
+            public static FontSystem baseEngineFont = new ();
             static Fonts()
             {
-                baseEngineFont = Core.AssetsManager.FontsManager.baseEngineFont;
+                baseEngineFont = AssetsManager.FontsManager.baseEngineFont;
             }
-            public static void AddFonts(string name, string path) => Core.AssetsManager.FontsManager.AddFont(name, path);
-            public static SpriteFontBase GetFont(string name, int fontSize) => Core.AssetsManager.FontsManager.userFonts[name].GetFont(fontSize);
+            public static void AddFonts(string name, string path) => AssetsManager.FontsManager.AddFont(name, path);
+            public static SpriteFontBase GetFont(string name, int fontSize) => AssetsManager.FontsManager.userFonts[name].GetFont(fontSize);
         } 
         public static class Image
         {
-            public static void AddImage(string name, ASCIIImage image) => Core.AssetsManager.ASCIIImageManager.AddImage(name, image);
+            public static void AddImage(string name, ASCIIImage image) => AssetsManager.ASCIIImageManager.AddImage(name, image);
             public static void AddImageFromFile(string name, SpriteFontBase spf, Color color, string path) 
-                => Core.AssetsManager.ASCIIImageManager.AddImageFromFile(name, spf, color, path);
-            public static ASCIIImage GetImage(string name) => Core.AssetsManager.ASCIIImageManager.GetImage(name);
+                => AssetsManager.ASCIIImageManager.AddImageFromFile(name, spf, color, path);
+            public static ASCIIImage GetImage(string name) => AssetsManager.ASCIIImageManager.GetImage(name);
         }
     }
     public static class Graphic
     {
-        private static SpriteFontBase baseSpf = Core.AssetsManager.FontsManager.baseEngineFont.GetFont(18);
+        private static SpriteFontBase baseSpf = AssetsManager.FontsManager.baseEngineFont.GetFont(18);
         public static void WriteLine(string text) => Core.GameConsole.Instance.WriteLine(baseSpf, text, Core.ConsoleGray);
         public static void WriteLine(string text, Color color) => Core.GameConsole.Instance.WriteLine(baseSpf, text, color);
         public static void WriteLine(string text, Color color, SpriteFontBase spf) => Core.GameConsole.Instance.WriteLine(spf, text, color); 
