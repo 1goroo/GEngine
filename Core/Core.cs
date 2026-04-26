@@ -43,6 +43,7 @@ namespace GEngine.Core
         public static Vector2 ScreenDrawAnchore = new Vector2(0.5f,0.5f);
         public static Color BackgroundColor = Core.ConsoleBlack;
         public static Color LetterboxingColor = Color.Black;
+        public static GameSettings Settings { get; internal set; }
 #if DEBUG
         public static bool DeveloperMode = true;
 #else
@@ -59,6 +60,7 @@ namespace GEngine.Core
     public class Core
     {
         public static Core Instance { get; private set; }
+        public GEngineGame game;
         public static readonly Color ConsoleBlack = new (12, 12, 12);
         public static readonly Color ConsoleGray = new (214, 214, 214);
         // Objects
@@ -80,18 +82,28 @@ namespace GEngine.Core
         //
         private GraphicsDevice graphicsDevice;
         internal ContentManager contentManager;
-        public Core(SpriteBatch _spriteBatch, GraphicsDevice graphicsDevice, ContentManager contentManager, GameWindow window) 
+        /// <summary>
+        /// Create & launches engine core
+        /// </summary>
+        /// <param name="Menaged Game"></param>
+        public Core(GEngineGame currentGame)
         {
-            spriteBatch = _spriteBatch;
-            displayManager = new DisplayManager(graphicsDevice);
+            // Set Game
+            game = currentGame;
+            // Set Fields
+            spriteBatch = currentGame._spriteBatch;
+            graphicsDevice = currentGame.GraphicsDevice;
+            contentManager = currentGame.Content;
+            window = currentGame.Window;
+            // Create Fields
+            displayManager = new DisplayManager(currentGame.GraphicsDevice);
+            // Set Instance
             Instance = this;
-            this.graphicsDevice = graphicsDevice;
-            this.contentManager = contentManager;
+            // Spawn Core objects
             ScreenBackground screenBackground = Spawn(new ScreenBackground());
             ImageWindow imageWindow = Spawn(new ImageWindow());
             GameConsole gameConsole = Spawn(new GameConsole());
             InformationConsole informationConsole = Spawn(new InformationConsole());
-            this.window = window;
         }
         public void AddObject(BaseObject baseObject) => AddList.Add(baseObject); 
         public void RemoveObject(BaseObject baseObject) => RemoveList.Add(baseObject);
@@ -197,21 +209,27 @@ namespace GEngine.Core
 
         public class ScreenBackground : BaseObject
         {
+            Transform transform = new (Transform.GetAnchore(Transform.Anchore.Right));
+            float coef = Utilities.GetPercentByScreen(280,true);
+            float co = Utilities.GetPercentByScreen(150, false);
+            float c = Utilities.GetPercentByScreen(18, true);
             public ScreenBackground(string name = null) : base(name) { }
             public override void Draw(SpriteBatch spriteBatch)
             {
-                var spf = AssetsManager.FontsManager.baseEngineFont.GetFont(18);
+                var spf = AssetsManager.FontsManager.baseEngineFont.GetFont(c*Config.pixelScreenWidth);
                 int deltaY = 0;
-                for (int i = 0; i < 40; i++) { spriteBatch.DrawString(spf, "|", new Vector2(1000, deltaY), ConsoleGray); deltaY += 18; }
-                spriteBatch.DrawString(spf, "H------------------------------", new Vector2(1000, 280), ConsoleGray);
+                transform.position = Transform.GetAnchore(Transform.Anchore.Right);
+                Vector2 pos = transform.GetBasePosition(Vector2.Zero);
+                for (int i = 0; i < 40; i++) { spriteBatch.DrawString(spf, "|", new Vector2(pos.X - Config.pixelScreenWidth * coef, deltaY), ConsoleGray); deltaY += spf.LineHeight; }
+                spriteBatch.DrawString(spf, "H------------------------------", new Vector2(pos.X - Config.pixelScreenWidth * coef, pos.Y - co * Config.pixelScreenHeight), ConsoleGray);
             }
         }
         public struct ConsoleLog(SpriteFontBase spriteFontBase, string text, Vector2 vector, Color color)
         {
-            SpriteFontBase spriteFontBase = spriteFontBase;
-            string text = text;
-            Vector2 vector = vector;
-            Color color = color;
+            public SpriteFontBase spriteFontBase = spriteFontBase;
+            public string text = text;
+            public Vector2 vector = vector;
+            public Color color = color;
             public void WriteLine(SpriteBatch spriteBatch, float delta)
                 => spriteFontBase.DrawText(spriteBatch, text, new Vector2(vector.X, vector.Y + delta), color);
         }
@@ -221,7 +239,8 @@ namespace GEngine.Core
             float deltaY = 0;
             float scrollDelta = 0;
             float scrollSensivity = 10;
-            List<ConsoleLog> logs = new List<ConsoleLog>();
+            List<ConsoleLog> logs = new ();
+            Transform position = new (Transform.GetAnchore(Transform.Anchore.TopLeft));
             public GameConsole(string name = null) : base(name) { Instance = this; }
             public override void Update()
             {
@@ -230,19 +249,26 @@ namespace GEngine.Core
             }
             public override void Draw(SpriteBatch _spriteBatch)
             {
-                for(int i = 0; i < logs.Count; i++) { logs[i].WriteLine(_spriteBatch,scrollDelta); }
+                for (int i = 0; i < logs.Count; i++) { logs[i].WriteLine(_spriteBatch, scrollDelta); }
             }
-            public void WriteLine(SpriteFontBase spf, string text,Color color)
+            public void WriteLine(SpriteFontBase spf, string text, Color color)
             {
-                logs.Add(new ConsoleLog(spf,text, new Vector2(0, 0 + deltaY),color));
-                deltaY += spf.FontSize;
+                Vector2 LogPunkt = position.GetBasePosition(Vector2.Zero);
+                LogPunkt = new Vector2(LogPunkt.X, LogPunkt.Y + deltaY);
+                logs.Add(new ConsoleLog(spf, text, LogPunkt, color));
+                deltaY += spf.LineHeight;
             }
-            public void Clear()
+            public ConsoleLog[] Clear()
             {
+                ConsoleLog[] i = logs.ToArray();
                 logs.Clear();
                 deltaY = 0;
                 scrollDelta = 0;
+                return i;
             }
+            void ReAnchore() => position = new(Transform.GetAnchore(Transform.Anchore.TopLeft));
+            public override void Awake() => Config.OnScreenSizeChanged += ReAnchore;
+            public override void OnDestroy() => Config.OnScreenSizeChanged -= ReAnchore;
         }
         public class ImageWindow : BaseObject 
         {
@@ -250,6 +276,8 @@ namespace GEngine.Core
             public ASCIIImage? currentImage { get; private set; }
             private float ignoreScale = 1;
             private Vector2 ignoreVector = Vector2.Zero;
+            float cx = Utilities.GetPercentByScreen(120, true);
+            float cy = Utilities.GetPercentByScreen(220, false);
             public ImageWindow(string name = null) : base(name)
             {
                 Instance = this;
@@ -260,7 +288,9 @@ namespace GEngine.Core
                 if (currentImage != null)
                 {
                     ASCIIImage image = (ASCIIImage)currentImage;
-                    Transform currTr = new Transform(new Vector2(520+ ignoreVector.X,220+ignoreVector.Y));
+                    Vector2 anc = Transform.GetAnchore(Transform.Anchore.TopRight);
+                    Transform currTr = new Transform(new Vector2(anc.X + ignoreVector.X - cx * Config.pixelScreenWidth,
+                        anc.Y - cy*Config.pixelScreenHeight +ignoreVector.Y));
                     float limit = 280f;
                     float s = Math.Min(limit / image.width, limit / image.height);
                     currTr.scale = new Vector2(s,s) * ignoreScale;
@@ -286,6 +316,9 @@ namespace GEngine.Core
             public static InformationConsole Instance { get; private set; }
             float deltaY = 0;
             List<ConsoleLog> logs = new List<ConsoleLog>();
+            Transform position = new Transform(Transform.GetAnchore(Transform.Anchore.Right));
+            float c = Utilities.GetPercentByScreen(270,true);
+            float cy = Utilities.GetPercentByScreen(100,false);
             public InformationConsole(string name = null) : base(name) { Instance = this; }
             public override void Draw(SpriteBatch _spriteBatch)
             {
@@ -293,14 +326,26 @@ namespace GEngine.Core
             }
             public void WriteLine(SpriteFontBase spf, string text, Color color)
             {
-                logs.Add(new ConsoleLog(spf, text, new Vector2(1010, 290 + deltaY), color));
-                deltaY += spf.FontSize;
+                Vector2 LogPunkt = position.GetBasePosition(Vector2.Zero);
+                LogPunkt = new Vector2(LogPunkt.X - c * Config.pixelScreenWidth, LogPunkt.Y - cy*Config.pixelScreenHeight + deltaY);
+                logs.Add(new ConsoleLog(spf, text, LogPunkt, color));
+                deltaY += spf.LineHeight;
             }
-            public void Clear()
+            public ConsoleLog[] Clear()
             {
+                ConsoleLog[] i = logs.ToArray();
                 logs.Clear();
                 deltaY = 0;
+                return i;
             }
+            void ReAnchore()
+            {
+                position = new(Transform.GetAnchore(Transform.Anchore.Right));
+                foreach (var log in Clear())
+                    WriteLine(log.spriteFontBase,log.text,log.color);
+            }
+            public override void Awake() => Config.OnScreenSizeChanged += ReAnchore;
+            public override void OnDestroy() => Config.OnScreenSizeChanged -= ReAnchore;
         }
     }
     public static class Debug

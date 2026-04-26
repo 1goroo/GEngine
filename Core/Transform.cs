@@ -7,6 +7,25 @@ namespace GEngine.Core
     {
         public Vector2 position = position;
         public Vector2 scale = scale ?? Vector2.One;
+        public enum Anchore { Center, Top, Bottom, Left, Right, TopLeft, TopRight, BottomLeft, BottomRight }
+        public static Vector2 GetAnchore(Anchore anchore)
+        {
+            Vector2 returnVector = Vector2.Zero;
+            switch (anchore)
+            {
+                case Anchore.Center: returnVector = Vector2.Zero; break;
+                case Anchore.Top: returnVector = new Vector2(0, Config.pixelScreenHeight * 0.5f); break;
+                case Anchore.Bottom: returnVector = new Vector2(0, Config.pixelScreenHeight * -0.5f); break;
+                case Anchore.Left: returnVector = new Vector2(Config.pixelScreenWidth * -0.5f, 0); break;
+                case Anchore.Right: returnVector = new Vector2(Config.pixelScreenWidth * 0.5f, 0); break;
+                case Anchore.TopLeft: returnVector = new Vector2(Config.pixelScreenWidth * -0.5f, Config.pixelScreenHeight * 0.5f); break;
+                case Anchore.TopRight: returnVector = new Vector2(Config.pixelScreenWidth * 0.5f, Config.pixelScreenHeight * 0.5f); break;
+                case Anchore.BottomLeft: returnVector = new Vector2(Config.pixelScreenWidth * -0.5f, Config.pixelScreenHeight * -0.5f); break;
+                case Anchore.BottomRight: returnVector = new Vector2(Config.pixelScreenWidth * 0.5f, Config.pixelScreenHeight * -0.5f); break;
+            }
+            return returnVector;
+        }
+
         public Vector2 GetBasePosition(Vector2 size)
         {
             Vector2 graphicsSize = new(Config.pixelScreenWidth, Config.pixelScreenHeight);
