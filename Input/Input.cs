@@ -1,4 +1,6 @@
-﻿using Microsoft.Xna.Framework.Input;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
+using System.Collections.Generic;
 
 namespace GEngine.Input
 {
@@ -8,6 +10,7 @@ namespace GEngine.Input
         static KeyboardState previousState;
         static MouseState currentMouseState = Mouse.GetState();
         static MouseState previousMouseState;
+        public static readonly Queue<char> inputQueue = new Queue<char>();
         /// <summary>
         /// Used by general core Update loop
         /// </summary>
@@ -38,6 +41,9 @@ namespace GEngine.Input
 
         public static bool AnyKeyDown() => currentState.GetPressedKeyCount() > 0 && previousState.GetPressedKeyCount() == 0;
 
+        internal static void InputChar(object sender, TextInputEventArgs e) => inputQueue.Enqueue(e.Character);
+        public static bool HasChar() => inputQueue.Count > 0;
+        public static char GetNextChar() => inputQueue.Dequeue();
         // Mouse
         /// <summary>
         /// returns true if the mouse button is pressed

@@ -45,6 +45,11 @@ namespace GEngine.Core
         public static Color LetterboxingColor = Color.Black;
         public static GameSettings Settings { get; internal set; }
         public static bool baseGamePreset = true;
+        public static bool IsMouseVisible 
+        {
+            get => Core.Instance.game.IsMouseVisible;
+            set => Core.Instance.game.IsMouseVisible = value;  
+        }
         public static string GameName { get; internal set; } = "GEGame";
 #if DEBUG
         public static bool DeveloperMode = true;
@@ -53,6 +58,7 @@ namespace GEngine.Core
 #endif
         public static bool DebugMode = false;
     }
+    public enum StorageSpace { Cache, Game }
     public interface IUpdatable { public void SystemUpdate(GameTime gameTime); }
     public interface IDrawable { public void Draw(SpriteBatch _spriteBatch); }
     public interface IAwakeable { public void Awake(); }
@@ -101,6 +107,8 @@ namespace GEngine.Core
             displayManager = new DisplayManager(currentGame.GraphicsDevice);
             // Set Instance
             Instance = this;
+            // Set Events
+            window.TextInput += Input.InputChar;
             // Spawn Core objects
             if (Config.baseGamePreset)
             {
@@ -211,11 +219,15 @@ namespace GEngine.Core
             if (nextScene != null)
             {
                 Instance.currentScene?.OnExit();
+                AssetsManager.CleanCache();
                 Instance.currentScene = nextScene;
+                Instance.currentScene.OnLoad();
+                Instance.currentScene.IsLoad = true;
                 Instance.currentScene.OnEnter();
                 nextScene = null;
             }
         }
+        public static void Exit() => Instance.game.Exit();
 
         private float GetFPS(GameTime gameTime) => 1f / (float)gameTime.ElapsedGameTime.TotalSeconds;
 
@@ -253,11 +265,34 @@ namespace GEngine.Core
             float scrollSensivity = 10;
             List<ConsoleLog> logs = new ();
             Transform position = new (Transform.GetAnchore(Transform.Anchore.TopLeft));
+            bool reading = false;
+            string readingBuffer;
+            public string lastRead { get; private set; }
             public GameConsole(string name = null) : base(name) { Instance = this; }
             public override void Update()
             {
                 if (Input.GetNormalizedWheelScroll() == 1) scrollDelta += scrollSensivity;
                 else if (Input.GetNormalizedWheelScroll() == -1) scrollDelta -= scrollSensivity;
+                if (reading)
+                {
+                    while (Input.HasChar())
+                    {
+                        var c = Input.GetNextChar();
+                        if (c == '\b') 
+                        {
+                            if (readingBuffer.Length > 0)
+                                readingBuffer = readingBuffer.Remove(readingBuffer.Length - 1);
+                        }
+                        else if (c >= ' ')
+                            readingBuffer += c;
+                    }
+
+                    var log = logs[logs.Count - 1];
+                    log.text = readingBuffer;
+                    logs[logs.Count - 1] = log;
+                    if (Input.GetKeyDown(Keys.Enter)) { reading = false; lastRead = readingBuffer; readingBuffer = ""; return; }
+                    return;
+                }
             }
             public override void Draw(SpriteBatch _spriteBatch)
             {
@@ -265,10 +300,18 @@ namespace GEngine.Core
             }
             public void WriteLine(SpriteFontBase spf, string text, Color color)
             {
+                if (reading) return;
                 Vector2 LogPunkt = position.GetBasePosition(Vector2.Zero);
                 LogPunkt = new Vector2(LogPunkt.X, LogPunkt.Y + deltaY);
                 logs.Add(new ConsoleLog(spf, text, LogPunkt, color));
                 deltaY += spf.LineHeight;
+            }
+            public void ReadLine(SpriteFontBase spf, Color color)
+            {
+                if (reading) return;
+                WriteLine(spf, "", color);
+                reading = true;
+                if (Input.HasChar()) readingBuffer += Input.GetNextChar();
             }
             public ConsoleLog[] Clear()
             {

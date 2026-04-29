@@ -27,6 +27,8 @@ namespace GEngine.Framework
 
         public static T Find<T>(string name, SearchScope searchScope = SearchScope.All) where T : BaseObject => Core.Find<T>(name, searchScope);
 
+        public static void Exit() => Core.Exit();
+
         public void Update(GameTime gameTime)
         {
             // Add
@@ -66,6 +68,8 @@ namespace GEngine.Framework
         public virtual void OnDraw() { }
         public virtual void OnEnter() { }
         public virtual void OnExit() { }
+        public bool IsLoad { get; internal set; } = false;
+        public virtual void OnLoad() { }
         public void ObjectListSort() => ObjectsList = ObjectsList.OrderBy(o => o.Layer).ToList();
     }
 }

@@ -3,11 +3,11 @@ using GEngine.Core;
 using Microsoft.Xna.Framework;
 using GEngine.Graphics;
 using GEngine.Assets;
-
 namespace GAPI
 {
     public static class Assets
     {
+
         public static class Fonts
         {
             public static FontSystem baseEngineFont = new ();
@@ -20,10 +20,11 @@ namespace GAPI
         } 
         public static class Image
         {
-            public static void AddImage(string name, ASCIIImage image) => AssetsManager.ASCIIImageManager.AddImage(name, image);
-            public static void AddImageFromFile(string name, SpriteFontBase spf, Color color, string path) 
-                => AssetsManager.ASCIIImageManager.AddImageFromFile(name, spf, color, path);
-            public static ASCIIImage GetImage(string name) => AssetsManager.ASCIIImageManager.GetImage(name);
+            public static void AddImage(string name, ASCIIImage image, StorageSpace spase = StorageSpace.Cache)
+                => AssetsManager.ASCIIImageManager.AddImage(name, image, spase);
+            public static void AddImageFromFile(string name, SpriteFontBase spf, Color color, string path, StorageSpace spase = StorageSpace.Cache) 
+                => AssetsManager.ASCIIImageManager.AddImageFromFile(name, spf, color, path, spase);
+            public static ASCIIImage GetImage(string name, StorageSpace spase = StorageSpace.Cache) => AssetsManager.ASCIIImageManager.GetImage(name, spase);
         }
     }
     public static class Graphic
@@ -39,6 +40,12 @@ namespace GAPI
 
         public static void SetImage(ASCIIImage image) => Core.ImageWindow.Instance.SetImage(image);
         public static void SetImage(ASCIIImage image, float ignoreScale, Vector2 ignoreVector) => Core.ImageWindow.Instance.SetImage(image, ignoreScale, ignoreVector);
+
+        public static void ReadLine() => Core.GameConsole.Instance.ReadLine(baseSpf, Core.ConsoleGray);
+        public static void ReadLine(Color color) => Core.GameConsole.Instance.ReadLine(baseSpf, color);
+        public static void ReadLine(Color color, SpriteFontBase spf) => Core.GameConsole.Instance.ReadLine(spf, color);
+
+        public static string GetLastRead() => Core.GameConsole.Instance.lastRead;
     }
     public static class Palettes
     {
