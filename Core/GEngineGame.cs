@@ -9,7 +9,7 @@ namespace GEngine.Core
         internal SpriteBatch _spriteBatch;
         Core generalCore;
         Scene startScene;
-        public GEngineGame(Scene StartScene, GameSettings gameSettings = null)
+        public GEngineGame(Scene StartScene, string gameName = null, GameSettings gameSettings = null)
         {
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
@@ -17,6 +17,7 @@ namespace GEngine.Core
             Window.AllowUserResizing = true;
             this.startScene = StartScene;
             Config.Settings = gameSettings ?? new ();
+            Config.GameName = gameName;
         }
         protected override void Initialize() => base.Initialize();
         protected override void LoadContent()

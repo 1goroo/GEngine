@@ -44,6 +44,8 @@ namespace GEngine.Core
         public static Color BackgroundColor = Core.ConsoleBlack;
         public static Color LetterboxingColor = Color.Black;
         public static GameSettings Settings { get; internal set; }
+        public static bool baseGamePreset = true;
+        public static string GameName { get; internal set; } = "GEGame";
 #if DEBUG
         public static bool DeveloperMode = true;
 #else
@@ -100,10 +102,20 @@ namespace GEngine.Core
             // Set Instance
             Instance = this;
             // Spawn Core objects
-            ScreenBackground screenBackground = Spawn(new ScreenBackground());
-            ImageWindow imageWindow = Spawn(new ImageWindow());
-            GameConsole gameConsole = Spawn(new GameConsole());
-            InformationConsole informationConsole = Spawn(new InformationConsole());
+            if (Config.baseGamePreset)
+            {
+                ScreenBackground screenBackground = Spawn(new ScreenBackground());
+                ImageWindow imageWindow = Spawn(new ImageWindow());
+                GameConsole gameConsole = Spawn(new GameConsole());
+                InformationConsole informationConsole = Spawn(new InformationConsole());
+            }
+            else
+            {
+                ScreenBackground screenBackground = new ScreenBackground();
+                ImageWindow imageWindow = new ImageWindow();
+                GameConsole gameConsole = new GameConsole();
+                InformationConsole informationConsole = new InformationConsole();
+            }
         }
         public void AddObject(BaseObject baseObject) => AddList.Add(baseObject); 
         public void RemoveObject(BaseObject baseObject) => RemoveList.Add(baseObject);
