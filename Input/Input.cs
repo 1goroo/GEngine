@@ -44,6 +44,7 @@ namespace GEngine.Input
         internal static void InputChar(object sender, TextInputEventArgs e) => inputQueue.Enqueue(e.Character);
         public static bool HasChar() => inputQueue.Count > 0;
         public static char GetNextChar() => inputQueue.Dequeue();
+        internal static void ClearInputQueue() => inputQueue.Clear();
         // Mouse
         /// <summary>
         /// returns true if the mouse button is pressed

@@ -3,6 +3,7 @@ using GEngine.Core;
 using Microsoft.Xna.Framework;
 using GEngine.Graphics;
 using GEngine.Assets;
+using System;
 namespace GAPI
 {
     public static class Assets
@@ -38,14 +39,18 @@ namespace GAPI
         public static void WriteLineInformation(string text, Color color) => Core.InformationConsole.Instance.WriteLine(baseSpf, text, color);
         public static void WriteLineInformation(string text, Color color, SpriteFontBase spf) => Core.InformationConsole.Instance.WriteLine(spf, text, color);
 
+        public static void ClearImage() => Core.ImageWindow.Instance.Clear();
         public static void SetImage(ASCIIImage image) => Core.ImageWindow.Instance.SetImage(image);
         public static void SetImage(ASCIIImage image, float ignoreScale, Vector2 ignoreVector) => Core.ImageWindow.Instance.SetImage(image, ignoreScale, ignoreVector);
 
         public static void ReadLine() => Core.GameConsole.Instance.ReadLine(baseSpf, Core.ConsoleGray);
         public static void ReadLine(Color color) => Core.GameConsole.Instance.ReadLine(baseSpf, color);
         public static void ReadLine(Color color, SpriteFontBase spf) => Core.GameConsole.Instance.ReadLine(spf, color);
-
-        public static string GetLastRead() => Core.GameConsole.Instance.lastRead;
+        public static void ReadLine(Color color, SpriteFontBase spf, Action<string> action) 
+            => Core.GameConsole.Instance.ReadLine(spf, color, action);
+        public static void ReadLine(Action<string> action) => Core.GameConsole.Instance.ReadLine(baseSpf, Core.ConsoleGray, action);
+        public static bool HasRead() => Core.GameConsole.Instance.HasLastRead();
+        public static string GetRead() => Core.GameConsole.Instance.GetLastRead();
     }
     public static class Palettes
     {

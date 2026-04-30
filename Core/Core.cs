@@ -45,6 +45,7 @@ namespace GEngine.Core
         public static Color LetterboxingColor = Color.Black;
         public static GameSettings Settings { get; internal set; }
         public static bool baseGamePreset = true;
+        public static bool clearScreenInSwitchScene = true;
         public static bool IsMouseVisible 
         {
             get => Core.Instance.game.IsMouseVisible;
@@ -219,6 +220,12 @@ namespace GEngine.Core
             if (nextScene != null)
             {
                 Instance.currentScene?.OnExit();
+                if (Config.clearScreenInSwitchScene)
+                {
+                    GameConsole.Instance.Clear();
+                    InformationConsole.Instance.Clear();
+                    ImageWindow.Instance.Clear();
+                }
                 AssetsManager.CleanCache();
                 Instance.currentScene = nextScene;
                 Instance.currentScene.OnLoad();
@@ -267,7 +274,17 @@ namespace GEngine.Core
             Transform position = new (Transform.GetAnchore(Transform.Anchore.TopLeft));
             bool reading = false;
             string readingBuffer;
+            bool freshRead = false;
+            Action<string> completeCallback;
             public string lastRead { get; private set; }
+            public bool HasLastRead() => freshRead;
+            public string GetLastRead()
+            {
+                string i = lastRead;
+                lastRead = string.Empty;
+                freshRead = false;
+                return i;
+            }
             public GameConsole(string name = null) : base(name) { Instance = this; }
             public override void Update()
             {
@@ -290,7 +307,15 @@ namespace GEngine.Core
                     var log = logs[logs.Count - 1];
                     log.text = readingBuffer;
                     logs[logs.Count - 1] = log;
-                    if (Input.GetKeyDown(Keys.Enter)) { reading = false; lastRead = readingBuffer; readingBuffer = ""; return; }
+                    if (Input.GetKeyDown(Keys.Enter)) 
+                    { 
+                        reading = false; 
+                        freshRead = true;
+                        lastRead = readingBuffer; 
+                        readingBuffer = "";
+                        completeCallback?.Invoke(GetLastRead());
+                        return; 
+                    }
                     return;
                 }
             }
@@ -309,9 +334,16 @@ namespace GEngine.Core
             public void ReadLine(SpriteFontBase spf, Color color)
             {
                 if (reading) return;
+                Input.ClearInputQueue();
                 WriteLine(spf, "", color);
                 reading = true;
+                freshRead = false;
                 if (Input.HasChar()) readingBuffer += Input.GetNextChar();
+            }
+            public void ReadLine(SpriteFontBase spf, Color color, Action<string> action)
+            {
+                completeCallback = action;
+                ReadLine(spf, color);
             }
             public ConsoleLog[] Clear()
             {
@@ -352,6 +384,12 @@ namespace GEngine.Core
                     
                     currentImage?.Draw(spriteBatch, currTr);
                 }
+            }
+            public void Clear()
+            {
+                currentImage = null;
+                ignoreScale = 1;
+                ignoreVector = Vector2.Zero;
             }
             public void SetImage(ASCIIImage newImage) 
             {
