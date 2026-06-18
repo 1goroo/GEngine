@@ -3,6 +3,7 @@ using GEngine.Core;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using System;
+using System.Collections.Generic;
 
 namespace GEngine.Graphics
 {
@@ -17,7 +18,8 @@ namespace GEngine.Graphics
         public float height;
         public float width;
         ASCIILine[] lines;
-        public ASCIIImage(string[] _text, SpriteFontBase _spf, Color _color)
+        ASCIILineShader lineShader = new BaseShader();
+        public ASCIIImage(string[] _text, SpriteFontBase _spf, Color _color, ASCIILineShader lineShader = null)
         {
             text = _text;
             spf = _spf;
@@ -66,7 +68,11 @@ namespace GEngine.Graphics
             Vector2 vector = Transform.GameToScreenPosition(position, height, width);
             if (text == null) return;
             for (int i = 0; i < text.Length; i++)
-                spriteBatch.DrawString(spf, lines[i].text, new Vector2(vector.X, vector.Y + spf.LineHeight * i), lines[i].lineColor);
+            {
+                lineShader.PreDraw(new Transform(position), lines[i].text, lines[i].lineColor);
+                spriteBatch.DrawString(spf, lineShader.ChangeText(lines[i].text), new Vector2(vector.X, vector.Y + spf.LineHeight * i),
+                    lineShader.ChangeColor(lineShader.ChangeColor(lines[i].lineColor)), 0, default);
+            }
         }
         /// <summary>
         /// Drawing ASCIIImage in game position
@@ -76,8 +82,11 @@ namespace GEngine.Graphics
             Vector2 vector = Transform.GameToScreenPosition(position, width * scale.X, height * scale.Y);
             if (text == null) return;
             for (int i = 0; i < text.Length; i++)
-                spriteBatch.DrawString(spf, lines[i].text, new Vector2(vector.X, vector.Y + spf.LineHeight * i * scale.Y),
-                    lines[i].lineColor, 0, default, scale);
+            {
+                lineShader.PreDraw(new Transform(position,scale), lines[i].text, lines[i].lineColor);
+                spriteBatch.DrawString(spf, lineShader.ChangeText(lines[i].text), new Vector2(vector.X, vector.Y + spf.LineHeight * i * scale.Y),
+                    lineShader.ChangeColor(lineShader.ChangeColor(lines[i].lineColor)), 0, default, scale);
+            }
         }
         /// <summary>
         /// Drawing ASCIIImage in game position
@@ -87,8 +96,12 @@ namespace GEngine.Graphics
             Vector2 vector = Transform.GameToScreenPosition(transform.position, width * transform.scale.X, height * transform.scale.Y);
             if (text == null) return;
             for (int i = 0; i < lines.Length; i++)
-                spriteBatch.DrawString(spf, lines[i].text, new Vector2(vector.X, vector.Y + spf.LineHeight * i * transform.scale.Y),
-                    lines[i].lineColor, 0, default, transform.scale);
+            {
+                lineShader.PreDraw(transform, lines[i].text, lines[i].lineColor);
+                spriteBatch.DrawString(spf, lineShader.ChangeText(lines[i].text), new Vector2(vector.X, vector.Y + spf.LineHeight * i * transform.scale.Y),
+                    lineShader.ChangeColor(lineShader.ChangeColor(lines[i].lineColor)), 0, default, transform.scale);
+            }
+
         }
         /// <summary>
         /// Stores line of ASCII image

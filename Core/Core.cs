@@ -163,6 +163,8 @@ namespace GEngine.Core
         {
             // Update Input
             Input.Update();
+            // Update Time
+            EngineTime.Update(gameTime);
             if (Input.GetKeyDown(Keys.F3) && Config.DeveloperMode) Config.DebugMode = !Config.DebugMode;
             // Add
             if (AddList.Count > 0)

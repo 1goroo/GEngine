@@ -8,7 +8,6 @@ namespace GAPI
 {
     public static class Assets
     {
-
         public static class Fonts
         {
             public static FontSystem baseEngineFont = new ();
@@ -31,24 +30,21 @@ namespace GAPI
     public static class Graphic
     {
         private static SpriteFontBase baseSpf = AssetsManager.FontsManager.baseEngineFont.GetFont(18);
-        public static void WriteLine(string text) => Core.GameConsole.Instance.WriteLine(baseSpf, text, Core.ConsoleGray);
-        public static void WriteLine(string text, Color color) => Core.GameConsole.Instance.WriteLine(baseSpf, text, color);
-        public static void WriteLine(string text, Color color, SpriteFontBase spf) => Core.GameConsole.Instance.WriteLine(spf, text, color); 
+        public static void WriteLine(string text, Color? color = null, SpriteFontBase spf = null)
+            => Core.GameConsole.Instance.WriteLine(spf ?? baseSpf, text, color ?? Core.ConsoleGray);
 
-        public static void WriteLineInformation(string text) => Core.InformationConsole.Instance.WriteLine(baseSpf, text, Core.ConsoleGray);
-        public static void WriteLineInformation(string text, Color color) => Core.InformationConsole.Instance.WriteLine(baseSpf, text, color);
-        public static void WriteLineInformation(string text, Color color, SpriteFontBase spf) => Core.InformationConsole.Instance.WriteLine(spf, text, color);
+        public static void WriteLineInformation(string text, Color? color = null, SpriteFontBase spf = null)
+            => Core.InformationConsole.Instance.WriteLine(spf ?? baseSpf, text, color ?? Core.ConsoleGray);
 
         public static void ClearImage() => Core.ImageWindow.Instance.Clear();
-        public static void SetImage(ASCIIImage image) => Core.ImageWindow.Instance.SetImage(image);
-        public static void SetImage(ASCIIImage image, float ignoreScale, Vector2 ignoreVector) => Core.ImageWindow.Instance.SetImage(image, ignoreScale, ignoreVector);
+        public static void SetImage(ASCIIImage image, float ignoreScale = 0, Vector2? ignoreVector = null) 
+            => Core.ImageWindow.Instance.SetImage(image, ignoreScale, ignoreVector ?? Vector2.Zero);
 
-        public static void ReadLine() => Core.GameConsole.Instance.ReadLine(baseSpf, Core.ConsoleGray);
-        public static void ReadLine(Color color) => Core.GameConsole.Instance.ReadLine(baseSpf, color);
-        public static void ReadLine(Color color, SpriteFontBase spf) => Core.GameConsole.Instance.ReadLine(spf, color);
-        public static void ReadLine(Color color, SpriteFontBase spf, Action<string> action) 
-            => Core.GameConsole.Instance.ReadLine(spf, color, action);
-        public static void ReadLine(Action<string> action) => Core.GameConsole.Instance.ReadLine(baseSpf, Core.ConsoleGray, action);
+        public static void ReadLine(Color? color = null, SpriteFontBase spf = null) 
+            => Core.GameConsole.Instance.ReadLine(spf ?? baseSpf, color ?? Core.ConsoleGray);
+        public static void ReadLine(Action<string> action, Color? color = null, SpriteFontBase spf = null) 
+            => Core.GameConsole.Instance.ReadLine(spf ?? baseSpf, color ?? Core.ConsoleGray, action);
+
         public static bool HasRead() => Core.GameConsole.Instance.HasLastRead();
         public static string GetRead() => Core.GameConsole.Instance.GetLastRead();
     }
