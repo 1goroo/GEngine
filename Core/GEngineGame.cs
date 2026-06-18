@@ -9,13 +9,13 @@ namespace GEngine.Core
         internal SpriteBatch _spriteBatch;
         Core generalCore;
         Scene startScene;
-        public GEngineGame(Scene StartScene, string gameName = null, GameSettings gameSettings = null)
+        public GEngineGame(Scene startScene, string gameName = null, GameSettings gameSettings = null)
         {
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
             Window.AllowUserResizing = true;
-            this.startScene = StartScene;
+            this.startScene = startScene;
             Config.Settings = gameSettings ?? new ();
             Config.GameName = gameName;
         }
@@ -33,7 +33,6 @@ namespace GEngine.Core
         }
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.Purple);
             generalCore.Draw(gameTime);
             base.Draw(gameTime);
         }

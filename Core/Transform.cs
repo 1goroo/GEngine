@@ -1,5 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using System;
 
 namespace GEngine.Core
 {
@@ -7,46 +6,41 @@ namespace GEngine.Core
     {
         public Vector2 position = position;
         public Vector2 scale = scale ?? Vector2.One;
-        public enum Anchore { Center, Top, Bottom, Left, Right, TopLeft, TopRight, BottomLeft, BottomRight }
-        public static Vector2 GetAnchore(Anchore anchore)
+        public enum Anchor { Center, Top, Bottom, Left, Right, TopLeft, TopRight, BottomLeft, BottomRight }
+        public static Vector2 GetAnchor(Anchor anchor)
         {
             Vector2 returnVector = Vector2.Zero;
-            switch (anchore)
+            switch (anchor)
             {
-                case Anchore.Center: returnVector = Vector2.Zero; break;
-                case Anchore.Top: returnVector = new Vector2(0, Config.pixelScreenHeight * 0.5f); break;
-                case Anchore.Bottom: returnVector = new Vector2(0, Config.pixelScreenHeight * -0.5f); break;
-                case Anchore.Left: returnVector = new Vector2(Config.pixelScreenWidth * -0.5f, 0); break;
-                case Anchore.Right: returnVector = new Vector2(Config.pixelScreenWidth * 0.5f, 0); break;
-                case Anchore.TopLeft: returnVector = new Vector2(Config.pixelScreenWidth * -0.5f, Config.pixelScreenHeight * 0.5f); break;
-                case Anchore.TopRight: returnVector = new Vector2(Config.pixelScreenWidth * 0.5f, Config.pixelScreenHeight * 0.5f); break;
-                case Anchore.BottomLeft: returnVector = new Vector2(Config.pixelScreenWidth * -0.5f, Config.pixelScreenHeight * -0.5f); break;
-                case Anchore.BottomRight: returnVector = new Vector2(Config.pixelScreenWidth * 0.5f, Config.pixelScreenHeight * -0.5f); break;
+                case Anchor.Center: returnVector = Vector2.Zero; break;
+                case Anchor.Top: returnVector = new Vector2(0, Config.pixelScreenHeight * 0.5f); break;
+                case Anchor.Bottom: returnVector = new Vector2(0, Config.pixelScreenHeight * -0.5f); break;
+                case Anchor.Left: returnVector = new Vector2(Config.pixelScreenWidth * -0.5f, 0); break;
+                case Anchor.Right: returnVector = new Vector2(Config.pixelScreenWidth * 0.5f, 0); break;
+                case Anchor.TopLeft: returnVector = new Vector2(Config.pixelScreenWidth * -0.5f, Config.pixelScreenHeight * 0.5f); break;
+                case Anchor.TopRight: returnVector = new Vector2(Config.pixelScreenWidth * 0.5f, Config.pixelScreenHeight * 0.5f); break;
+                case Anchor.BottomLeft: returnVector = new Vector2(Config.pixelScreenWidth * -0.5f, Config.pixelScreenHeight * -0.5f); break;
+                case Anchor.BottomRight: returnVector = new Vector2(Config.pixelScreenWidth * 0.5f, Config.pixelScreenHeight * -0.5f); break;
             }
             return returnVector;
         }
 
-        public Vector2 GetBasePosition(Vector2 size)
-        {
-            Vector2 graphicsSize = new(Config.pixelScreenWidth, Config.pixelScreenHeight);
-            return new Vector2(graphicsSize.X * 0.5f + position.X - size.X * scale.X * 0.5f,
-                graphicsSize.Y * 0.5f - position.Y - size.Y * scale.Y * 0.5f);
-        }
+        public Vector2 GetBasePosition(Vector2 size) => new Vector2(
+                (Config.pixelScreenWidth - size.X * scale.X) * 0.5f + position.X,
+                (Config.pixelScreenHeight - size.Y * scale.Y) * 0.5f - position.Y);
         public static Vector2 ScreenToGamePosition(Vector2 position)
         {
-            Vector2 BackBufferSize = new Vector2(Core.Instance.displayManager.graphicsDevice.PresentationParameters.BackBufferWidth,
-                Core.Instance.displayManager.graphicsDevice.PresentationParameters.BackBufferHeight);
-            float coefWidth = BackBufferSize.X / Config.pixelScreenWidth;
-            float coefHeight = BackBufferSize.Y / Config.pixelScreenHeight;
-            float minCoef = Math.Min(coefWidth, coefHeight);
+            Vector2 BackBufferSize = Core.Instance.displayManager.BackBufferSize;
+            float minCoef = Core.Instance.displayManager.minCoef;
 
-            float offsetX = (BackBufferSize.X - Config.pixelScreenWidth * minCoef) * Config.ScreenDrawAnchore.X;
-            float offsetY = (BackBufferSize.Y - Config.pixelScreenHeight * minCoef) * Config.ScreenDrawAnchore.Y;
+            float offsetX = (BackBufferSize.X - Config.pixelScreenWidth * minCoef) * Config.ScreenDrawAnchor.X;
+            float offsetY = (BackBufferSize.Y - Config.pixelScreenHeight * minCoef) * Config.ScreenDrawAnchor.Y;
 
-            return new Vector2((position.X - offsetX) / minCoef - Config.pixelScreenWidth * Config.ScreenDrawAnchore.X,
-                -((position.Y - offsetY) / minCoef - Config.pixelScreenHeight * Config.ScreenDrawAnchore.Y));
+            return new Vector2((position.X - offsetX) / minCoef - Config.pixelScreenWidth * Config.ScreenDrawAnchor.X,
+                -((position.Y - offsetY) / minCoef - Config.pixelScreenHeight * Config.ScreenDrawAnchor.Y));
         }
-        public static Vector2 GameToScreenPosition(Vector2 position, float width, float height)
-            => new Vector2(Config.pixelScreenWidth * 0.5f + position.X - width * 0.5f, Config.pixelScreenHeight * 0.5f - position.Y - height * 0.5f);
+        public static Vector2 GameToScreenPosition(Vector2 position, float width, float height) => new Vector2(
+            (Config.pixelScreenWidth - width) * 0.5f + position.X,
+            (Config.pixelScreenHeight - height) * 0.5f - position.Y);
     }
 }

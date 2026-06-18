@@ -1,5 +1,4 @@
-﻿
-namespace GEngine.Core
+﻿namespace GEngine.Core
 {
     public class GameSettings
     {
