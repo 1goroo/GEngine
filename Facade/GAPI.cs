@@ -30,7 +30,7 @@ namespace GAPI
         public static class Audio
         {
             public static void AddAudioFromFile(string name, string path) => AssetsManager.Audio.AddAudioFromFile(name, path);
-            public static AudioStream GetAudio(string name) => AssetsManager.Audio.GetAudio(name);
+            public static AudioSource GetAudio(string name) => AssetsManager.Audio.GetAudio(name);
         }
     }
     public static class Graphic

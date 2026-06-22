@@ -116,9 +116,17 @@ namespace GEngine.Assets
             //    }
             //    return default;
             //}
-            static Dictionary<string, AudioStream> userAudio = new Dictionary<string, AudioStream>();
-            public static void AddAudioFromFile(string name, string Path) => userAudio.Add(name, new AudioStream(Path));
-            public static AudioStream GetAudio(string name) => userAudio[name];
+            static Dictionary<string, AudioSource> userAudio = new Dictionary<string, AudioSource>();
+            public static void AddAudioFromFile(string name, string path) => userAudio.Add(name, CreateAudioByExtension(path));
+            public static AudioSource GetAudio(string name) => userAudio[name];
+            private static AudioSource CreateAudioByExtension(string path)
+            {
+                return Path.GetExtension(path) switch
+                {
+                    ".mp3" => new AudioSourceMP3(path),
+                    _ => default
+                };
+            }
         }
     }
 }

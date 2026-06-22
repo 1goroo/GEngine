@@ -18,7 +18,7 @@ namespace GEngine.Audio
         }
         public static async Task PlayOneShot(string Path)
         {
-            var audio = new AudioStream(Path);
+            var audio = new AudioSourceMP3(Path);
             audio.Play();
             while (audio.IsPlaying) await Task.Yield(); 
             audio.Stop();
