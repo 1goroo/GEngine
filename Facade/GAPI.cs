@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework;
 using GEngine.Graphics;
 using GEngine.Assets;
 using System;
+using GEngine.Audio;
 namespace GAPI
 {
     public static class Assets
@@ -13,23 +14,28 @@ namespace GAPI
             public static FontSystem baseEngineFont = new ();
             static Fonts()
             {
-                baseEngineFont = AssetsManager.FontsManager.baseEngineFont;
+                baseEngineFont = AssetsManager.Fonts.baseEngineFont;
             }
-            public static void AddFonts(string name, string path) => AssetsManager.FontsManager.AddFont(name, path);
-            public static SpriteFontBase GetFont(string name, int fontSize) => AssetsManager.FontsManager.userFonts[name].GetFont(fontSize);
+            public static void AddFonts(string name, string path) => AssetsManager.Fonts.AddFont(name, path);
+            public static SpriteFontBase GetFont(string name, int fontSize) => AssetsManager.Fonts.userFonts[name].GetFont(fontSize);
         } 
-        public static class Image
+        public static class Images
         {
             public static void AddImage(string name, ASCIIImage image, StorageSpace spase = StorageSpace.Cache)
-                => AssetsManager.ASCIIImageManager.AddImage(name, image, spase);
+                => AssetsManager.ASCIIImage.AddImage(name, image, spase);
             public static void AddImageFromFile(string name, SpriteFontBase spf, Color color, string path, StorageSpace spase = StorageSpace.Cache) 
-                => AssetsManager.ASCIIImageManager.AddImageFromFile(name, spf, color, path, spase);
-            public static ASCIIImage GetImage(string name, StorageSpace spase = StorageSpace.Cache) => AssetsManager.ASCIIImageManager.GetImage(name, spase);
+                => AssetsManager.ASCIIImage.AddImageFromFile(name, spf, color, path, spase);
+            public static ASCIIImage GetImage(string name, StorageSpace spase = StorageSpace.Cache) => AssetsManager.ASCIIImage.GetImage(name, spase);
+        }
+        public static class Audio
+        {
+            public static void AddAudioFromFile(string name, string path) => AssetsManager.Audio.AddAudioFromFile(name, path);
+            public static AudioStream GetAudio(string name) => AssetsManager.Audio.GetAudio(name);
         }
     }
     public static class Graphic
     {
-        private static SpriteFontBase baseSpf = AssetsManager.FontsManager.baseEngineFont.GetFont(18);
+        private static SpriteFontBase baseSpf = AssetsManager.Fonts.baseEngineFont.GetFont(18);
         public static void WriteLine(string text, Color? color = null, SpriteFontBase spf = null)
             => Core.GameConsole.Instance.WriteLine(spf ?? baseSpf, text, color ?? Core.ConsoleGray);
 

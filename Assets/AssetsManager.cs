@@ -1,12 +1,10 @@
 ﻿using FontStashSharp;
-using GEngine.Graphics;
-using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Media;
+using GEngine.Audio;
+using GEngine.Core;
+using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using Microsoft.Xna.Framework;
-using GEngine.Core;
 
 namespace GEngine.Assets
 {
@@ -14,13 +12,13 @@ namespace GEngine.Assets
     {
         internal static void CleanCache()
         {
-            ASCIIImageManager.CleanCache();
+            ASCIIImage.CleanCache();
         }
-        public static class FontsManager
+        public static class Fonts
         {
             public static Dictionary<string, FontSystem> userFonts = new Dictionary<string, FontSystem>();
             public static FontSystem baseEngineFont = new FontSystem();
-            static FontsManager()
+            static Fonts()
             {
                 var assembly = typeof(Core.Core).Assembly;
                 using (Stream stream = assembly.GetManifestResourceStream($"{assembly.GetName().Name}.Content.Fonts.CascadiaCode-Light.otf"))
@@ -38,17 +36,17 @@ namespace GEngine.Assets
                 userFonts[name].AddFont(File.ReadAllBytes(path));
             }
         }
-        public static class ASCIIImageManager
+        public static class ASCIIImage
         {
-            static Dictionary<string, ASCIIImage> userASCIIImage = new Dictionary<string, ASCIIImage>();
-            static Dictionary<string, ASCIIImage> cacheASCIIImage = new Dictionary<string, ASCIIImage>();
+            static Dictionary<string, Graphics.ASCIIImage> userASCIIImage = new Dictionary<string, Graphics.ASCIIImage>();
+            static Dictionary<string, Graphics.ASCIIImage> cacheASCIIImage = new Dictionary<string, Graphics.ASCIIImage>();
             static string[] interrobangText = {
                     " --- ",
                     "| ? |",
                     " --- "
                 };
-            static ASCIIImage interrobangASCIIImage = new ASCIIImage(interrobangText, FontsManager.baseEngineFont.GetFont(18), Color.Wheat);
-            public static void AddImage(string name, ASCIIImage image, StorageSpace spase = StorageSpace.Cache)
+            static Graphics.ASCIIImage interrobangASCIIImage = new Graphics.ASCIIImage(interrobangText, Fonts.baseEngineFont.GetFont(18), Color.Wheat);
+            public static void AddImage(string name, Graphics.ASCIIImage image, StorageSpace spase = StorageSpace.Cache)
             {
                 if ((userASCIIImage.ContainsKey(name) && spase == StorageSpace.Game)||(cacheASCIIImage.ContainsKey(name) && spase == StorageSpace.Cache))
                 {
@@ -74,15 +72,15 @@ namespace GEngine.Assets
                     Console.WriteLine("[Exeption] GE0101: Content path not exist (AddImageFromFile).");
                     return;
                 }
-                ASCIIImage image = new ASCIIImage(File.ReadAllLines(contentPath), spf, color);
+                Graphics.ASCIIImage image = new Graphics.ASCIIImage(File.ReadAllLines(contentPath), spf, color);
                 if (spase == StorageSpace.Game)
                     userASCIIImage.Add(name, image);
                 else if (spase == StorageSpace.Cache)
                     cacheASCIIImage.Add(name, image);
             }
-            public static ASCIIImage GetImage(string name, StorageSpace spase = StorageSpace.Cache)
+            public static Graphics.ASCIIImage GetImage(string name, StorageSpace spase = StorageSpace.Cache)
             {
-                ASCIIImage returnImage = interrobangASCIIImage;
+                Graphics.ASCIIImage returnImage = interrobangASCIIImage;
                 if (spase == StorageSpace.Game)
                     returnImage = userASCIIImage.ContainsKey(name) ? userASCIIImage[name] : interrobangASCIIImage;
                 else if (spase == StorageSpace.Cache)
@@ -91,33 +89,36 @@ namespace GEngine.Assets
             }
             internal static void CleanCache() { cacheASCIIImage.Clear(); }
         }
-        public static class AudioManager
+        public static class Audio
         {
-            public static Dictionary<string, SoundEffect> userSoundEffects = new Dictionary<string, SoundEffect>();
-            public static Dictionary<string, Song> userSongs = new Dictionary<string, Song>();
-            public static void AddAudioElementFromMGCB<T>(string name, string MGCBPath)
-            {
-                T asset = Core.Core.Instance.contentManager.Load<T>(MGCBPath);
-                if (asset == null) return;
-                if (asset is SoundEffect)
-                    userSoundEffects.Add(name, asset as SoundEffect);
-                else if (asset is Song)
-                    userSongs.Add(name, asset as Song);
-            }
-            public static T GetAudioElement<T>(string name)
-            {
-                if (typeof(T) == typeof(SoundEffect))
-                {
-                    if (userSoundEffects.TryGetValue(name, out var soundEffect))
-                        return (T)(object)soundEffect;
-                }
-                else if (typeof(T) == typeof(Song) && userSongs.ContainsKey(name))
-                {
-                    if (userSongs.TryGetValue(name, out var song))
-                        return (T)(object)song;
-                }
-                return default;
-            }
+            //public static Dictionary<string, SoundEffect> userSoundEffects = new Dictionary<string, SoundEffect>();
+            //public static Dictionary<string, Song> userSongs = new Dictionary<string, Song>();
+            //public static void AddAudioElementFromMGCB<T>(string name, string MGCBPath)
+            //{
+            //    T asset = Core.Core.Instance.contentManager.Load<T>(MGCBPath);
+            //    if (asset == null) return;
+            //    if (asset is SoundEffect)
+            //        userSoundEffects.Add(name, asset as SoundEffect);
+            //    else if (asset is Song)
+            //        userSongs.Add(name, asset as Song);
+            //}
+            //public static T GetAudioElement<T>(string name)
+            //{
+            //    if (typeof(T) == typeof(SoundEffect))
+            //    {
+            //        if (userSoundEffects.TryGetValue(name, out var soundEffect))
+            //            return (T)(object)soundEffect;
+            //    }
+            //    else if (typeof(T) == typeof(Song) && userSongs.ContainsKey(name))
+            //    {
+            //        if (userSongs.TryGetValue(name, out var song))
+            //            return (T)(object)song;
+            //    }
+            //    return default;
+            //}
+            static Dictionary<string, AudioStream> userAudio = new Dictionary<string, AudioStream>();
+            public static void AddAudioFromFile(string name, string Path) => userAudio.Add(name, new AudioStream(Path));
+            public static AudioStream GetAudio(string name) => userAudio[name];
         }
     }
 }

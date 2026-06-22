@@ -252,7 +252,7 @@ namespace GEngine.Core
             public ScreenBackground(string name = null) : base(name) { }
             public override void Draw(SpriteBatch spriteBatch)
             {
-                var spf = AssetsManager.FontsManager.baseEngineFont.GetFont(c*Config.pixelScreenWidth);
+                var spf = AssetsManager.Fonts.baseEngineFont.GetFont(c*Config.pixelScreenWidth);
                 int deltaY = 0;
                 transform.position = Transform.GetAnchor(Transform.Anchor.Right);
                 Vector2 pos = transform.GetBasePosition(Vector2.Zero);
@@ -460,8 +460,8 @@ namespace GEngine.Core
     {
         public static Vector2 FPSCounterPosition = new (1220, 5);
         public static Vector2 MousePositionHandler = new (1235, 20);
-        private static SpriteFontBase font14 = AssetsManager.FontsManager.baseEngineFont.GetFont(14);
-        private static SpriteFontBase font13 = AssetsManager.FontsManager.baseEngineFont.GetFont(13);
+        private static SpriteFontBase font14 = AssetsManager.Fonts.baseEngineFont.GetFont(14);
+        private static SpriteFontBase font13 = AssetsManager.Fonts.baseEngineFont.GetFont(13);
 
         private static MouseState mouseState;
         private static Vector2 newMouse;
