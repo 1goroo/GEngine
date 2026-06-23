@@ -16,6 +16,15 @@ namespace GEngine.Audio
                 _ => AudioChannels.Mono
             };
         }
+        internal static AudioChannels AudioFormatToMonogame(int channels)
+        {
+            return channels switch
+            {
+                1 => AudioChannels.Mono,
+                2 => AudioChannels.Stereo,
+                _ => AudioChannels.Mono
+            };
+        }
         public static async Task PlayOneShot(string Path)
         {
             var audio = new AudioSourceMP3(Path);

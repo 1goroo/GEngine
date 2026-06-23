@@ -9,7 +9,7 @@ GEngine is game framevork for ASCII graphic text game.
 
 * **Graphics**: Simple text rendering powered by `FontStashSharp`, special classes for drawing ASCII image.
 * **Physics**: None. (The framework focuses purely on architecture/graphics).
-* **Audio**: In development { `mp3` - added | `wav` - to be added later | `ogg` - possibly later }
+* **Audio**: Basic, without MonoGame (supported formats: mp3, wav. ogg will be added later)
 
 ## For what?
 * This framevork intendet for:
@@ -20,6 +20,7 @@ GEngine is game framevork for ASCII graphic text game.
 ## Used frameworks
 * MonoGame
 * FontStachSharp
+* NLayer
 
 ## How to start with GEngine?
 Very simple!
@@ -43,10 +44,12 @@ using var game = new GEngineGame(new MainMenuScene(), "My Cool Game Name");
 game.Run();
 ```
 
-## Important classes and name spase
+## Important classes and Namespaces
 * GAPI (Namespace - GAPI) - Adds the ability to easily use the base template and core - display text and images, use resources, etc.
-* Scene (Namespace - GEngine.Framework) - having hook methods: OnUpdate, OnDraw, OnEnter, OnExit, OnLoad and methods 
+* Scene (Namespace - GEngine.Framework) - Having hook methods: OnUpdate, OnDraw, OnEnter, OnExit, OnLoad and methods 
 for manipulating objects: Destroy, Find, Spawn and SpawnToGlobal.
-* BaseObject (Namespace - GEngine.Framework) - having hook methods: Update, Draw, Awake, Start, OnDestroy, mehods for manipulating objects and method Invoke for action in time.
-* Input (Namespace - GEngine.Input) - add methods for get keyboard and mouse actions by methods.
-* ASCIIImage (Namespace - GEngine.Graphic) - struct for drawing art by text.
+* BaseObject (Namespace - GEngine.Framework) - Having hook methods: Update, Draw, Awake, Start, OnDestroy, mehods for manipulating objects and method Invoke for action in time.
+* Input (Namespace - GEngine.Input) - Add methods for get keyboard and mouse actions by methods.
+* ASCIIImage (Namespace - GEngine.Graphic) - Struct for drawing art by text.
+* AudioSource (Namespace - GEngine.Audio) - Class for working with audio. 
+* AudioManager (Namespace - GEngine.Audio) - Adds a method for working with audio: PlayOneShot

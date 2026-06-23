@@ -124,6 +124,7 @@ namespace GEngine.Assets
                 return Path.GetExtension(path) switch
                 {
                     ".mp3" => new AudioSourceMP3(path),
+                    ".wav" => new AudioSourceWAV(path),
                     _ => default
                 };
             }

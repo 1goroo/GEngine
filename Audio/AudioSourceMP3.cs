@@ -8,6 +8,9 @@ namespace GEngine.Audio
     public class AudioSourceMP3 : AudioSource
     {
         MpegFile MPegFile;
+        byte[] buffer;
+        float[] samplesBuffer;
+        short[] schBuffer;
         public AudioSourceMP3(string path)
         {
             if (path == null)
@@ -16,15 +19,16 @@ namespace GEngine.Audio
             SoundEffectInstance = new DynamicSoundEffectInstance(MPegFile.SampleRate, AudioManager.AudioFormatToMonogame(MPegFile));
             SoundEffectInstance.BufferNeeded += GetBuffer;
             Core.Core.Instance.game.Exiting += D;
+
+            buffer = new byte[GetBufferSize(MPegFile)];
+            samplesBuffer = new float[MPegFile.SampleRate * MPegFile.Channels / 10];
+            schBuffer = new short[samplesBuffer.Length];
         }
         private void BlankRead() => MPegFile.Position = 1152;
         public void GetBuffer(object sender, EventArgs e)
         {
-            byte[] buffer = new byte[GetBufferSize(MPegFile)];
-            float[] samplesBuffer = new float[MPegFile.SampleRate * MPegFile.Channels / 10];
             int bytesRead = MPegFile.ReadSamples(samplesBuffer, 0, samplesBuffer.Length);
             if (bytesRead <= 0) return;
-            short[] schBuffer = new short[samplesBuffer.Length];
             buffer = GetByteArray(samplesBuffer, schBuffer, bytesRead).ToArray();
             if (bytesRead < samplesBuffer.Length)
             {
