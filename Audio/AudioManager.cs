@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Audio;
 using NLayer;
+using NVorbis;
 using System.Threading.Tasks;
 
 namespace GEngine.Audio
@@ -19,6 +20,15 @@ namespace GEngine.Audio
         internal static AudioChannels AudioFormatToMonogame(int channels)
         {
             return channels switch
+            {
+                1 => AudioChannels.Mono,
+                2 => AudioChannels.Stereo,
+                _ => AudioChannels.Mono
+            };
+        }
+        internal static AudioChannels AudioFormatToMonogame(VorbisReader reader)
+        {
+            return reader.Channels switch
             {
                 1 => AudioChannels.Mono,
                 2 => AudioChannels.Stereo,

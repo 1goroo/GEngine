@@ -25,7 +25,12 @@ namespace GEngine.Audio
         public void GetBuffer(object sender, EventArgs e)
         {
             int bytesRead = file.stream.Read(buffer, 0, buffer.Length);
-            if (bytesRead <= 0) return;
+            if (bytesRead <= 0) 
+            {
+                if (!Looping) SoundEffectInstance.Stop();
+                else { file.Position = 0; BlankRead(); }
+                return;
+            }
             if (bytesRead < buffer.Length)
             {
                 Span<byte> b = buffer;

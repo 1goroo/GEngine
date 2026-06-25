@@ -6,12 +6,12 @@ using System.Collections.Generic;
 
 namespace GEngine.Core
 {
-    using Microsoft.Xna.Framework.Content;
-    using System;
-    using GEngine.Graphics;
-    using GEngine.Input;
     using GEngine.Assets;
     using GEngine.Framework;
+    using GEngine.Graphics;
+    using GEngine.Input;
+    using Microsoft.Xna.Framework.Content;
+    using System;
 
     public static class Config
     {
@@ -366,33 +366,42 @@ namespace GEngine.Core
         {
             public static ImageWindow Instance { get; private set; }
             public ASCIIImage? currentImage { get; private set; }
+            public ASCIIAnimation currentAnimation { get; private set; }
             private float ignoreScale = 1;
             private Vector2 ignoreVector = Vector2.Zero;
             float cx = Utilities.GetPercentByScreen(120, true);
-            float cy = Utilities.GetPercentByScreen(220, false);
+            float cy = Utilities.GetPercentByScreen(120, false);
+            float limit = 280f;
             public ImageWindow(string name = null) : base(name)
             {
                 Instance = this;
                 currentImage = null;
+                currentAnimation = null;
             }
+            public override void Update() => currentAnimation?.Update();
             public override void Draw(SpriteBatch spriteBatch)
             {
                 if (currentImage != null)
                 {
                     ASCIIImage image = (ASCIIImage)currentImage;
-                    Vector2 anc = Transform.GetAnchor(Transform.Anchor.TopRight);
-                    Transform currTr = new Transform(new Vector2(anc.X + ignoreVector.X - cx * Config.pixelScreenWidth,
-                        anc.Y - cy*Config.pixelScreenHeight +ignoreVector.Y));
-                    float limit = 280f;
-                    float s = Math.Min(limit / image.width, limit / image.height);
-                    currTr.scale = new Vector2(s,s) * ignoreScale;
-                    
-                    currentImage?.Draw(spriteBatch, currTr);
+                    currentImage?.Draw(spriteBatch, ImageCentred(image.width, image.height));
                 }
+                if (currentAnimation != null)
+                    currentAnimation?.Draw(spriteBatch, ImageCentred(currentAnimation.width, currentAnimation.height));
+            }
+            private Transform ImageCentred(float width, float height)
+            {
+                Vector2 anc = Transform.GetAnchor(Transform.Anchor.TopRight);
+                Transform currTr = new Transform(new Vector2(anc.X + ignoreVector.X - cx * Config.pixelScreenWidth,
+                    anc.Y - cy * Config.pixelScreenHeight + ignoreVector.Y));
+                float s = Math.Min(limit / width, limit / height);
+                currTr.scale = new Vector2(s, s) * ignoreScale;
+                return currTr;
             }
             public void Clear()
             {
                 currentImage = null;
+                currentAnimation = null;
                 ignoreScale = 1;
                 ignoreVector = Vector2.Zero;
             }
@@ -402,19 +411,41 @@ namespace GEngine.Core
             /// <param name="newImage">new Image</param>
             public void SetImage(ASCIIImage newImage) 
             {
+                Clear();
                 currentImage = newImage;
-                ignoreScale = 1;
-                ignoreVector = Vector2.Zero;
             }
             /// <summary>
             /// Set ASCIIImage to Image icon
             /// </summary>
             /// <param name="newImage">New Image</param>
             /// <param name="ignoreScale">Aditional scale Image</param>
-            /// /// <param name="ignoreVector">Aditional position Image</param>
-            public void SetImage(ASCIIImage newImage, float ignoreScale, Vector2 ignoreVector)
+            /// <param name="ignoreVector">Aditional position Image</param>
+            public void SetImage(ASCIIImage newImage, float ignoreScale, Vector2? ignoreVector)
             {
+                Clear();
                 currentImage = newImage;
+                this.ignoreScale = ignoreScale;
+                this.ignoreVector = ignoreVector ?? Vector2.One;
+            }
+            /// <summary>
+            /// Set ASCIIIAnimation to Image icon
+            /// </summary>
+            /// <param name="newImage">new Image</param>
+            public void SetAnimation(ASCIIAnimation newAnumation)
+            {
+                Clear();
+                currentAnimation = newAnumation;
+            }
+            /// <summary>
+            /// Set ASCIIIAnimation to Image icon
+            /// </summary>
+            /// <param name="newImage">new Image</param>
+            /// <param name="ignoreScale">Aditional scale Image</param>
+            /// <param name="ignoreVector">Aditional position Image</param>
+            public void SetAnimation(ASCIIAnimation newAnumation, float ignoreScale, Vector2 ignoreVector)
+            {
+                Clear();
+                currentAnimation = newAnumation;
                 this.ignoreScale = ignoreScale;
                 this.ignoreVector = ignoreVector;
             }

@@ -125,6 +125,7 @@ namespace GEngine.Assets
                 {
                     ".mp3" => new AudioSourceMP3(path),
                     ".wav" => new AudioSourceWAV(path),
+                    ".ogg" => new AudioSourceOGG(path),
                     _ => default
                 };
             }

@@ -43,7 +43,7 @@ namespace GAPI
             => Core.InformationConsole.Instance.WriteLine(spf ?? baseSpf, text, color ?? Core.ConsoleGray);
 
         public static void ClearImage() => Core.ImageWindow.Instance.Clear();
-        public static void SetImage(ASCIIImage image, float ignoreScale = 0, Vector2? ignoreVector = null) 
+        public static void SetImage(ASCIIImage image, float ignoreScale = 1, Vector2? ignoreVector = null) 
             => Core.ImageWindow.Instance.SetImage(image, ignoreScale, ignoreVector ?? Vector2.Zero);
 
         public static void ReadLine(Color? color = null, SpriteFontBase spf = null) 

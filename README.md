@@ -9,7 +9,7 @@ GEngine is game framevork for ASCII graphic text game.
 
 * **Graphics**: Simple text rendering powered by `FontStashSharp`, special classes for drawing ASCII image.
 * **Physics**: None. (The framework focuses purely on architecture/graphics).
-* **Audio**: Basic, without MonoGame (supported formats: mp3, wav. ogg will be added later)
+* **Audio**: Basic, without MGCB (supported formats: `mp3`, `wav`, `ogg`)
 
 ## For what?
 * This framevork intendet for:
@@ -21,6 +21,7 @@ GEngine is game framevork for ASCII graphic text game.
 * MonoGame
 * FontStachSharp
 * NLayer
+* NVorbis
 
 ## How to start with GEngine?
 Very simple!
